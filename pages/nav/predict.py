@@ -25,8 +25,8 @@ def predict_image(img):
     predictions = model.predict(prepared_image)
     return predictions
 
-# Função para verificar se a imagem é uma ressonância magnética (básica)
-def is_mri_image(img):
+# Função para verificar se a imagem é uma ressonância magnética do cérebro
+def is_brain_mri_image(img):
     try:
         # Verificar formato da imagem
         if img.format not in ('JPEG', 'PNG'):
@@ -41,6 +41,10 @@ def is_mri_image(img):
         if img.mode not in ('L', 'RGB'):
             return False
 
+        # Simulação de uma verificação adicional para a imagem do cérebro
+        # No mundo real, seria necessário um modelo de classificação mais avançado
+        # para identificar se a imagem é de uma ressonância magnética do cérebro especificamente.
+        # Aqui, usamos apenas as verificações básicas.
         return True
     except Exception as e:
         return False
@@ -52,12 +56,12 @@ def show_prediction():
     st.title("Previsão de Tumor Cerebral 🧠")
 
     # Carregar imagem
-    uploaded_file = st.file_uploader("Escolha uma imagem de ressonância magnética", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Escolha uma imagem de ressonância magnética ou raio X", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
         img = Image.open(uploaded_file)
-        if not is_mri_image(img):
-            st.error("Isso não é uma ressonância magnética. Por favor, carregue uma imagem apropriada.")
+        if not is_brain_mri_image(img):
+            st.warning("Isso não parece ser uma ressonância magnética do cérebro ou uma imagem apropriada. Por favor, carregue uma imagem relevante.")
             return
 
         st.image(uploaded_file, caption='Imagem carregada', use_column_width=True)
