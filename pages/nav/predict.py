@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from PIL import Image
+import io
 import time
 
 # Carregar o modelo salvo
@@ -27,11 +28,21 @@ def predict_image(img):
 # Função para verificar se a imagem é uma ressonância magnética (básica)
 def is_mri_image(img):
     try:
-        # Aqui você pode adicionar mais verificações específicas para imagens de ressonância magnética
-        if img.mode in ('L', 'RGB'):  # Verificar se a imagem é em escala de cinza ou RGB
-            return True
-        return False
-    except:
+        # Verificar formato da imagem
+        if img.format not in ('JPEG', 'PNG'):
+            return False
+
+        # Verificar dimensões da imagem (exemplo: entre 100x100 e 1000x1000 pixels)
+        width, height = img.size
+        if not (100 <= width <= 1000 and 100 <= height <= 1000):
+            return False
+
+        # Verificar se a imagem é em escala de cinza ou RGB
+        if img.mode not in ('L', 'RGB'):
+            return False
+
+        return True
+    except Exception as e:
         return False
 
 # Classes
@@ -46,7 +57,7 @@ def show_prediction():
     if uploaded_file is not None:
         img = Image.open(uploaded_file)
         if not is_mri_image(img):
-            st.error("Por favor, carregue uma imagem de ressonância magnética válida.")
+            st.error("Isso não é uma ressonância magnética. Por favor, carregue uma imagem apropriada.")
             return
 
         st.image(uploaded_file, caption='Imagem carregada', use_column_width=True)
