@@ -42,9 +42,6 @@ def is_brain_mri_image(img):
             return False
 
         # Simulação de uma verificação adicional para a imagem do cérebro
-        # No mundo real, seria necessário um modelo de classificação mais avançado
-        # para identificar se a imagem é de uma ressonância magnética do cérebro especificamente.
-        # Aqui, usamos apenas as verificações básicas.
         return True
     except Exception as e:
         return False
