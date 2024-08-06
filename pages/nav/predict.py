@@ -64,7 +64,7 @@ def show_prediction():
         st.image(uploaded_file, caption='Imagem carregada', use_column_width=True)
         
         if st.button("Fazer Previsão"):
-            with st.spinner('Realizando previsão...'):
+            with st.spinner('Analisando a imagem...'):
                 time.sleep(2)
                 predictions = predict_image(uploaded_file)
                 predicted_index = np.argmax(predictions)
