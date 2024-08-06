@@ -94,5 +94,4 @@ Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICEN
 
 Esperamos que este projeto possa contribuir para avanços significativos na área da saúde e detecção de tumores cerebrais. Obrigado por seu interesse!
 
-```
 
