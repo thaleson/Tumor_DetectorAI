@@ -4,7 +4,6 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from PIL import Image
-import io
 import time
 
 # Carregar o modelo salvo
@@ -25,11 +24,11 @@ def predict_image(img):
     predictions = model.predict(prepared_image)
     return predictions
 
-# Função para verificar se a imagem é uma ressonância magnética do cérebro
-def is_brain_mri_image(img):
+# Função para verificar se a imagem é uma ressonância magnética ou raio-X
+def is_valid_medical_image(img):
     try:
         # Verificar formato da imagem
-        if img.format not in ('JPEG', 'PNG'):
+        if img.format not in ('JPEG', 'PNG', 'JPG'):
             return False
 
         # Verificar dimensões da imagem (exemplo: entre 100x100 e 1000x1000 pixels)
@@ -41,7 +40,19 @@ def is_brain_mri_image(img):
         if img.mode not in ('L', 'RGB'):
             return False
 
-        # Simulação de uma verificação adicional para a imagem do cérebro
+        # Verificação simplificada de conteúdo típico de ressonância magnética ou raio-X.
+        # Isso pode incluir análise de histograma, contraste, entre outros fatores.
+        # Aqui vamos simular essa verificação:
+        avg_pixel_value = np.mean(np.array(img))
+        if img.mode == 'L':  # Escala de cinza
+            if not (40 < avg_pixel_value < 210):  # Verifica brilho médio típico
+                return False
+        elif img.mode == 'RGB':
+            grayscale_img = img.convert('L')
+            avg_pixel_value = np.mean(np.array(grayscale_img))
+            if not (40 < avg_pixel_value < 210):
+                return False
+
         return True
     except Exception as e:
         return False
@@ -57,8 +68,8 @@ def show_prediction():
 
     if uploaded_file is not None:
         img = Image.open(uploaded_file)
-        if not is_brain_mri_image(img):
-            st.warning("Isso não parece ser uma ressonância magnética do cérebro ou uma imagem apropriada. Por favor, carregue uma imagem relevante.")
+        if not is_valid_medical_image(img):
+            st.warning("Isso não parece ser uma ressonância magnética ou raio X válido. Por favor, carregue uma imagem relevante.")
             return
 
         st.image(uploaded_file, caption='Imagem carregada', use_column_width=True)
