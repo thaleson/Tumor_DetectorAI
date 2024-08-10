@@ -37,7 +37,7 @@ def is_brain_mri_image(img):
         if not (100 <= width <= 1000 and 100 <= height <= 1000):
             return False
 
-        # Verificar se a imagem é em escala de cinza ou RGB
+        # Verificar se a imagem é em escala de cinza ou RGB.
         if img.mode not in ('L', 'RGB'):
             return False
 
