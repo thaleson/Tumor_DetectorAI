@@ -26,7 +26,7 @@ def predict_image(img):
     return predictions
 
 # Função aprimorada para verificar se a imagem é uma ressonância magnética do cérebro ou raio-X
-def is_brain_mri_image(img):
+def is_brain_mri_or_xray_image(img):
     try:
         # Verificar dimensões da imagem
         width, height = img.size
@@ -53,7 +53,6 @@ def is_brain_mri_image(img):
         if mean_hist_value > 180 or mean_hist_value < 50:
             return False
 
-        # Simulação de uma verificação adicional para a imagem do cérebro
         return True
     except Exception as e:
         return False
@@ -69,7 +68,7 @@ def show_prediction():
 
     if uploaded_file is not None:
         img = Image.open(uploaded_file)
-        if not is_brain_mri_image(img):
+        if not is_brain_mri_or_xray_image(img):
             st.warning("Isso não parece ser uma ressonância magnética do cérebro ou uma imagem apropriada. Por favor, carregue uma imagem relevante.")
             return
 
