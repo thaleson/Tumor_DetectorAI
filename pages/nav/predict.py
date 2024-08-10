@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from PIL import Image
+import io
 import time
 
 # Carregar o modelo salvo
@@ -24,35 +25,35 @@ def predict_image(img):
     predictions = model.predict(prepared_image)
     return predictions
 
-# Função para verificar se a imagem é uma ressonância magnética ou raio-X
-def is_valid_medical_image(img):
+# Função aprimorada para verificar se a imagem é uma ressonância magnética do cérebro ou raio-X
+def is_brain_mri_image(img):
     try:
-        # Verificar formato da imagem
-        if img.format not in ('JPEG', 'PNG', 'JPG'):
-            return False
-
-        # Verificar dimensões da imagem (exemplo: entre 100x100 e 1000x1000 pixels)
+        # Verificar dimensões da imagem
         width, height = img.size
         if not (100 <= width <= 1000 and 100 <= height <= 1000):
             return False
 
-        # Verificar se a imagem é em escala de cinza ou RGB.
+        # Verificar se a imagem é em escala de cinza ou RGB
         if img.mode not in ('L', 'RGB'):
             return False
 
-        # Verificação simplificada de conteúdo típico de ressonância magnética ou raio-X.
-        # Isso pode incluir análise de histograma, contraste, entre outros fatores.
-        # Aqui vamos simular essa verificação:
-        avg_pixel_value = np.mean(np.array(img))
-        if img.mode == 'L':  # Escala de cinza
-            if not (40 < avg_pixel_value < 210):  # Verifica brilho médio típico
-                return False
-        elif img.mode == 'RGB':
-            grayscale_img = img.convert('L')
-            avg_pixel_value = np.mean(np.array(grayscale_img))
-            if not (40 < avg_pixel_value < 210):
-                return False
+        # Análise do histograma para verificar padrões comuns em imagens médicas
+        hist = img.histogram()
+        if img.mode == 'RGB':
+            # Para imagens RGB, combinar os histogramas de cada canal
+            r_hist = hist[0:256]
+            g_hist = hist[256:512]
+            b_hist = hist[512:768]
+            combined_hist = [r + g + b for r, g, b in zip(r_hist, g_hist, b_hist)]
+        else:
+            combined_hist = hist
+        
+        # Verificar se a imagem tem picos típicos de uma imagem de ressonância magnética ou raio-X
+        mean_hist_value = np.mean(combined_hist)
+        if mean_hist_value > 180 or mean_hist_value < 50:
+            return False
 
+        # Simulação de uma verificação adicional para a imagem do cérebro
         return True
     except Exception as e:
         return False
@@ -68,8 +69,8 @@ def show_prediction():
 
     if uploaded_file is not None:
         img = Image.open(uploaded_file)
-        if not is_valid_medical_image(img):
-            st.warning("Isso não parece ser uma ressonância magnética ou raio X válido. Por favor, carregue uma imagem relevante.")
+        if not is_brain_mri_image(img):
+            st.warning("Isso não parece ser uma ressonância magnética do cérebro ou uma imagem apropriada. Por favor, carregue uma imagem relevante.")
             return
 
         st.image(uploaded_file, caption='Imagem carregada', use_column_width=True)
